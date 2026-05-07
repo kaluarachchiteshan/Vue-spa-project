@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useDarkMode } from '@/composables/useDarkMode'
 import { useFilters } from '@/composables/useFilters'
+import type { Country, Language, Currency, RegionalSettings } from '@/types'
 
 const emit = defineEmits<{
   'open-login': []
@@ -18,6 +19,42 @@ const { searchQuery, setSearch, clearSearch } = useFilters()
 
 const searchInput = ref(searchQuery.value)
 const mobileSearchOpen = ref(false)
+
+// Regional settings
+const regionalSettingsOpen = ref(false)
+const currentSettings = ref<RegionalSettings>({
+  country: { code: 'US', name: 'United States', flag: '🇺🇸' },
+  language: { code: 'en', name: 'English', nativeName: 'English' },
+  currency: { code: 'USD', name: 'US Dollar', symbol: '$' }
+})
+
+const countries: Country[] = [
+  { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰' }
+]
+
+const languages: Language[] = [
+  { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'fr', name: 'French', nativeName: 'Français' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語' }
+]
+
+const currencies: Currency[] = [
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' }
+]
 
 function handleSearch(): void {
   setSearch(searchInput.value)
@@ -41,6 +78,41 @@ function handleInput(event: Event): void {
 function openCart(): void {
   cartStore.openDrawer()
 }
+
+function toggleRegionalSettings(): void {
+  regionalSettingsOpen.value = !regionalSettingsOpen.value
+}
+
+function saveRegionalSettings(): void {
+  // Save to localStorage
+  localStorage.setItem('regionalSettings', JSON.stringify(currentSettings.value))
+  regionalSettingsOpen.value = false
+}
+
+function handleClickOutside(event: Event): void {
+  const target = event.target as HTMLElement
+  if (!target.closest('.regional-settings-container')) {
+    regionalSettingsOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+  // Load saved settings
+  const saved = localStorage.getItem('regionalSettings')
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      currentSettings.value = parsed
+    } catch (e) {
+      console.warn('Failed to parse saved regional settings')
+    }
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 const cartBadgeVisible = computed(() => cartStore.totalItems > 0)
 </script>
@@ -176,6 +248,105 @@ const cartBadgeVisible = computed(() => cartStore.totalItems > 0)
               />
             </svg>
           </button>
+
+          <!-- Regional Settings -->
+          <div class="relative regional-settings-container">
+            <button
+              class="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+              aria-label="Regional settings"
+              @click="toggleRegionalSettings"
+            >
+              <span
+                :class="`fi fi-${currentSettings.country.code.toLowerCase()} rounded-full w-6 h-6`"
+                class="inline-block bg-cover bg-center border border-gray-200 dark:border-gray-600"
+              ></span>
+            </button>
+
+            <!-- Regional Settings Popover -->
+            <transition
+              enter-active-class="transition-all duration-200 ease-out"
+              enter-from-class="opacity-0 scale-95"
+              enter-to-class="opacity-100 scale-100"
+              leave-active-class="transition-all duration-150 ease-in"
+              leave-from-class="opacity-100 scale-100"
+              leave-to-class="opacity-0 scale-95"
+            >
+              <div
+                v-if="regionalSettingsOpen"
+                class="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                @click.stop
+              >
+                <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                  Regional Settings
+                </h3>
+
+                <!-- Ship to -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Ship to
+                  </label>
+                  <select
+                    v-model="currentSettings.country"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  >
+                    <option
+                      v-for="country in countries"
+                      :key="country.code"
+                      :value="country"
+                    >
+                      {{ country.flag }} {{ country.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Language -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Language
+                  </label>
+                  <select
+                    v-model="currentSettings.language"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  >
+                    <option
+                      v-for="language in languages"
+                      :key="language.code"
+                      :value="language"
+                    >
+                      {{ language.nativeName }} ({{ language.name }})
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Currency -->
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Currency
+                  </label>
+                  <select
+                    v-model="currentSettings.currency"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  >
+                    <option
+                      v-for="currency in currencies"
+                      :key="currency.code"
+                      :value="currency"
+                    >
+                      {{ currency.symbol }} {{ currency.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Save Button -->
+                <button
+                  class="w-full rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                  @click="saveRegionalSettings"
+                >
+                  Save
+                </button>
+              </div>
+            </transition>
+          </div>
 
           <!-- Auth Button -->
           <template v-if="authStore.isAuthenticated">

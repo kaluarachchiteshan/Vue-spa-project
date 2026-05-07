@@ -91,3 +91,29 @@ export interface ApiError {
   message: string
   status?: number
 }
+
+// ─── Regional Settings Types ──────────────────────────────────────────────────
+
+export interface Country {
+  code: string
+  name: string
+  flag: string
+}
+
+export interface Language {
+  code: string
+  name: string
+  nativeName: string
+}
+
+export interface Currency {
+  code: string
+  name: string
+  symbol: string
+}
+
+export interface RegionalSettings {
+  country: Country
+  language: Language
+  currency: Currency
+}
