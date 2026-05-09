@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
 import CartDrawer from '@/components/CartDrawer.vue'
 import LoginModal from '@/components/LoginModal.vue'
+import FooterSection from '@/components/FooterSection.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useDarkMode } from '@/composables/useDarkMode'
@@ -41,5 +42,7 @@ onMounted(() => {
     <CartDrawer />
 
     <LoginModal :is-open="isLoginOpen" @close="isLoginOpen = false" />
+
+    <FooterSection />
   </div>
 </template>
