@@ -100,20 +100,6 @@ export interface Country {
   flag: string
 }
 
-export interface Language {
-  code: string
-  name: string
-  nativeName: string
-}
-
-export interface Currency {
-  code: string
-  name: string
-  symbol: string
-}
-
 export interface RegionalSettings {
   country: Country
-  language: Language
-  currency: Currency
 }

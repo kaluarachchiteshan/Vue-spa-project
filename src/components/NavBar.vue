@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
 import { useDarkMode } from '@/composables/useDarkMode'
 import { useFilters } from '@/composables/useFilters'
-import type { Country, Language, Currency, RegionalSettings } from '@/types'
+import type { Country, RegionalSettings } from '@/types'
 
 const emit = defineEmits<{
   'open-login': []
@@ -23,9 +23,7 @@ const mobileSearchOpen = ref(false)
 // Regional settings
 const regionalSettingsOpen = ref(false)
 const currentSettings = ref<RegionalSettings>({
-  country: { code: 'US', name: 'United States', flag: '🇺🇸' },
-  language: { code: 'en', name: 'English', nativeName: 'English' },
-  currency: { code: 'USD', name: 'US Dollar', symbol: '$' }
+  country: { code: 'US', name: 'United States', flag: '🇺🇸' }
 })
 
 const countries: Country[] = [
@@ -37,23 +35,6 @@ const countries: Country[] = [
   { code: 'JP', name: 'Japan', flag: '🇯🇵' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
   { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰' }
-]
-
-const languages: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español' },
-  { code: 'fr', name: 'French', nativeName: 'Français' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch' },
-  { code: 'ja', name: 'Japanese', nativeName: '日本語' }
-]
-
-const currencies: Currency[] = [
-  { code: 'USD', name: 'US Dollar', symbol: '$' },
-  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
-  { code: 'GBP', name: 'British Pound', symbol: '£' },
-  { code: 'EUR', name: 'Euro', symbol: '€' },
-  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
-  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' }
 ]
 
 function handleSearch(): void {
@@ -281,7 +262,7 @@ const cartBadgeVisible = computed(() => cartStore.totalItems > 0)
                 </h3>
 
                 <!-- Ship to -->
-                <div class="mb-4">
+                <div class="mb-6">
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Ship to
                   </label>
@@ -295,44 +276,6 @@ const cartBadgeVisible = computed(() => cartStore.totalItems > 0)
                       :value="country"
                     >
                       {{ country.flag }} {{ country.name }}
-                    </option>
-                  </select>
-                </div>
-
-                <!-- Language -->
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Language
-                  </label>
-                  <select
-                    v-model="currentSettings.language"
-                    class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option
-                      v-for="language in languages"
-                      :key="language.code"
-                      :value="language"
-                    >
-                      {{ language.nativeName }} ({{ language.name }})
-                    </option>
-                  </select>
-                </div>
-
-                <!-- Currency -->
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Currency
-                  </label>
-                  <select
-                    v-model="currentSettings.currency"
-                    class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option
-                      v-for="currency in currencies"
-                      :key="currency.code"
-                      :value="currency"
-                    >
-                      {{ currency.symbol }} {{ currency.name }}
                     </option>
                   </select>
                 </div>
