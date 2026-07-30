@@ -34,7 +34,8 @@ const countries: Country[] = [
   { code: 'FR', name: 'France', flag: '🇫🇷' },
   { code: 'JP', name: 'Japan', flag: '🇯🇵' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰' }
+  { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' }
 ]
 
 function handleSearch(): void {
