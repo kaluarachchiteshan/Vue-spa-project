@@ -5,7 +5,7 @@ Data is sourced from the [DummyJSON](https://dummyjson.com) public API.
 
 ---
 
-## ✨ Features
+## ✨  Features
 
 | Feature | Details |
 |---|---|
